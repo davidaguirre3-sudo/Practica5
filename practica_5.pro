@@ -9,6 +9,7 @@ SOURCES += \
         simulador.cpp
 
 HEADERS += \
+    particula.h \
     registrosalida.h \
     simulador.h
 

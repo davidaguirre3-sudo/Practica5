@@ -1,4 +1,5 @@
 #include "registrosalida.h"
+#include "particula.h"
 
 #include <iomanip>
 
@@ -21,6 +22,14 @@ RegistroSalida::~RegistroSalida()
 bool RegistroSalida::estaAbierto() const
 {
     return archivo.is_open();
+}
+
+void RegistroSalida::guardarPosicion(double t, Particula* p)
+{
+    if (!archivo.is_open() || p == 0)
+        return;
+    archivo << "P," << t << ',' << p->getId() << ','
+            << p->getX() << ',' << p->getY() << ',' << p->getRadio() << '\n';
 }
 
 void RegistroSalida::guardarColision(double t, short tipo, int idA, int idB)
