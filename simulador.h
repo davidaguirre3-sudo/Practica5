@@ -27,16 +27,15 @@ private:
     Simulador& operator=(const Simulador&) = delete;
 
 public:
-    // Paso 4
+
     Simulador(const Caja& caja, double dt, double e, const std::string& archivoSalida);
     ~Simulador();
     void agregarParticula(Particula* p);
     void agregarObstaculo(Obstaculo* o);
 
-    // Paso 5
+
     void ejecutar(int pasos);
 
-    // Paso 6
     void paso();
 
     double getTiempo() const;

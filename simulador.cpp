@@ -1,11 +1,10 @@
 #include "simulador.h"
 #include "particula.h"
 #include "obstaculo.h"
+#include "colisiones.h"
 #include "registrosalida.h"
 
 #include <iostream>
-
-// ---------------- Paso 4: base ----------------
 
 Simulador::Simulador(const Caja& caja, double dt, double e, const std::string& archivoSalida)
     : caja(caja), registro(new RegistroSalida(archivoSalida)), dt(dt), tiempo(0.0), e(e)
@@ -57,8 +56,8 @@ void Simulador::paso()
             particulas[i]->mover(dt);
     }
     tiempo += dt;
-    detectarColisiones();
 
+    detectarColisiones();
 
     guardarEstado();
 }
@@ -68,7 +67,34 @@ double Simulador::getTiempo() const
     return tiempo;
 }
 
-
 void Simulador::detectarColisiones()
 {
+    for (size_t i = 0; i < particulas.size(); i++) {
+        Particula* p = particulas[i];
+        if (p->estaActiva() && choqueConPared(p, caja))
+            registro->guardarColision(tiempo, COLISION_PARED, p->getId(), -1);
+    }
+
+    for (size_t i = 0; i < particulas.size(); i++) {
+        Particula* p = particulas[i];
+        if (!p->estaActiva())
+            continue;
+        for (size_t j = 0; j < obstaculos.size(); j++) {
+            if (choqueConObstaculo(p, obstaculos[j], e))
+                registro->guardarColision(tiempo, COLISION_OBSTACULO, p->getId(), (int)j);
+        }
+    }
+
+    for (size_t i = 0; i < particulas.size(); i++) {
+        Particula* a = particulas[i];
+        if (!a->estaActiva())
+            continue;
+        for (size_t j = i + 1; j < particulas.size(); j++) {
+            Particula* b = particulas[j];
+            if (!b->estaActiva())
+                continue;
+            if (choqueEntreParticulas(a, b))
+                registro->guardarColision(tiempo, COLISION_PARTICULA, a->getId(), b->getId());
+        }
+    }
 }
